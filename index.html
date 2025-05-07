@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glove Decoder</title>
+</head>
+<body>
+    <h1>Glove Decoder</h1>
+
+    <label for="encoded">Enter encoded glove (e.g., Diamond2):</label><br>
+    <input type="text" id="encoded" placeholder="e.g., Diamond2"><br><br>
+    <button onclick="decode()">Decode</button><br><br>
+    
+    <h2>Decoded Letter:</h2>
+    <p id="decodedLetter"></p>
+
+    <script>
+        // Glove categories and their corresponding letters
+        const categories = {
+            'Slap': ['spin', 'Default', 'Dual', 'Diamond', 'ZZZZZZZ', 'Extended', 'Brick', 'Snow', 'Pull', 'Flash', 'Spring', 'Swapper', 'Bull', 'Dice', 'Ghost', 'Thanos', 'Stun', 'L.O.L.B.O.M.B', 'Za Hando', 'Fort', 'Magnet', 'Pusher', 'Anchor', 'Space', 'Boomerang', 'Speedrun', 'Mail', 'T H I C K', 'Golden', 'Squid', 'MR', 'Hive', 'Reaper', 'Baby', 'Replica', 'Mace', 'Defense', 'Killstreak', 'Reverse', 'Shukuchi', 'Duelist', 'woah', 'Ice', 'Gummy', 'Adios', 'Blocked', 'Divert', 'Engineer', 'Rocky', 'Coil', 'Conveyor', 'Balloony', 'Phantom', 'el gato', 'Wormhole', 'Shackle', 'Flick', 'STOP', 'Equalizer', 'Track', 'Stalker', 'Prop', 'Cherry', 'Shield', 'Clover', 'Booster', 'Ping Pong', 'Baller', 'Home Run', 'Whirlwind', 'Slicer', 'Excavator', 'Nightmare', 'Thor', 'Pocket', 'Grapple', 'Cloud', 'Gravity', 'Parry', 'Jebaited', 'Meteor', 'Oven', 'Guardian Angel', 'Sun', 'Ferryman', 'Blackhole', 'Blink', 'Tableflip', 'Slapstick', 'Beatdown', 'Chicken', 'BONK', 'Sbeve', 'Golem', 'Grab', 'UFO', 'Demolition', 'Beachball', 'Shotgun', 'Error', '64', 'Roguelike', 'Barrel', 'Lawnmower', 'Virus', 'Infinity', 'Aggro', 'Medusa', 'Seal', 'Soul', 'God’s Hand', 'The Flex'],
+            'Badge': ['MEGAROCK', 'Plague', 'Hallow Jack', '[REDACTED]', 'bus', 'Mitten', 'Phase', 'Warp', 'Bomb', 'Bubble', 'Jet', 'Shard', 'potato', 'CULT', 'bob', 'buddies', 'Moon', 'Jupiter', 'Spy', 'Detonator', 'Rage', 'Trap', 'Orbit', 'Hybrid', 'Slapple', 'Disarm', 'Dominance', 'Link', 'Chain', 'Rattlebones', 'Charge', 'Tycoon', 'Confusion', 'Glitch', 'Snowball', 'Elude', 'RNG', 'fish', '🗿', 'Obby', 'Voodoo', 'Goofy', 'Leash', 'Flamarang', 'Kinetic', 'Berserk', 'Sparky', 'Boogie', 'Recall', 'Quake', 'Psycho', 'Kraken', 'Counter', 'Hammer', 'rob', 'Rhythm', 'Rojo', 'Hitman', 'Retro', 'Null', 'Lure', 'Tinkerer', 'Necromancer', 'Alchemist', 'Druid', 'Jester', 'Scythe', 'Santa', 'Iceskate', 'Blasphemy', 'Pan', 'Admin', 'Joust', 'Firework', 'Run', 'Glovel', 'Divebomb', 'Lamp', 'Knockoff', 'Frostbite', 'Plank', 'Spoonful', 'the schlob', 'Siphon', 'Wrench', 'Relude', 'Hunter', 'Avatar', 'Water', 'Fan', 'Boxer', 'MATERIALIZE', 'Bind', 'Poltergeist', 'Clock', 'Untitled Tag Glove', 'Pillow', 'Angler', 'Jerry', 'Snowroller', 'Draw4', 'Mouse', 'Hexa', 'Metaverse', 'Swordfighter', 'Eggler'],
+            'SR': ['Pack-A-Punch', 'Vigorous', 'Aerialist', 'Tank', 'Pow', 'Faculty', 'Revenge', 'Juggernaut', 'Void', 'Aquarius', 'Thundercaller', 'Missile-Launcher', 'Glacier', 'KABOOM', 'Witch', 'Vampire', 'Cannoneer'],
+            'Gamepass': ['OVERKILL', 'Spectator', 'CUSTOM', 'Ultra Instinct', 'Titan', 'Killerfish'],
+            'Other': ['Acrobat']
+        };
+
+        // Letter ranges for each category
+        const categoryLetterRanges = {
+            'Slap': ['A', 'B', 'C', 'D', 'E', 'F'],
+            'Badge': ['G', 'H', 'I', 'J', 'K', 'L'],
+            'SR': ['M', 'N', 'O', 'P', 'Q', 'R'],
+            'Gamepass': ['S', 'T', 'U', 'V', 'W', 'X'],
+            'Other': ['Y', 'Z']
+        };
+
+        function decode() {
+            let encodedInput = document.getElementById("encoded").value.trim();
+            let gloveName = encodedInput.slice(0, -1); // Get the glove name (remove the last character)
+            let number = parseInt(encodedInput.slice(-1)); // Get the number (last character)
+
+            // Determine the category of the glove
+            let category = null;
+            for (let cat in categories) {
+                if (categories[cat].includes(gloveName)) {
+                    category = cat;
+                    break;
+                }
+            }
+
+            if (!category) {
+                document.getElementById("decodedLetter").textContent = "Glove not found.";
+                return;
+            }
+
+            // Check the number range (1-6)
+            if (number < 1 || number > 6) {
+                document.getElementById("decodedLetter").textContent = "Invalid number. Please use 1-6.";
+                return;
+            }
+
+            // Get the corresponding letter for the category and number
+            let letters = categoryLetterRanges[category];
+            let decodedLetter = letters[number - 1]; // Subtract 1 because arrays are 0-indexed
+
+            // Output the decoded letter
+            document.getElementById("decodedLetter").textContent = "Decoded Letter: " + decodedLetter;
+        }
+    </script>
+</body>
+</html>
